@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحديد السموم بالصورة - LiPH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* متغيرات الهيدر */
+            --primary-blue: #0f204b;
+            --accent-teal: #2abfba;
+            --gradient-text: linear-gradient(135deg, #0f204b 0%, #2abfba 100%);
+            --header-height: 80px;
+            --text-grey: #666;
+
+            /* متغيرات الصفحة */
+            --primary-color: #1e293b;
+            --secondary-color: #0ea5e9;
+            --accent-color: #3b82f6;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+            --danger-high-bg: #fee2e2;
+            --danger-high-text: #991b1b;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Poppins', 'Cairo', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- ستايل الهيدر الموحد --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 1001;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-grey);
+        }
+
+        .nav-links a {
+            transition: color 0.3s;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-links a:hover, .nav-links a.active-link {
+            color: var(--accent-teal);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        @media (max-width: 900px) {
+            .menu-toggle { display: block; }
+            .nav-links {
+                position: absolute;
+                top: var(--header-height);
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 0;
+                height: 0;
+                overflow: hidden;
+                transition: all 0.3s ease-in-out;
+                box-shadow: 0 10px 10px rgba(0,0,0,0.05);
+                border-bottom: 1px solid var(--border-color);
+            }
+            .nav-links.active {
+                height: auto;
+                padding: 30px 0;
+                border-bottom: 3px solid var(--accent-teal);
+            }
+        }
+
+        /* --- محتوى الصفحة --- */
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            flex: 1; /* يأخذ المساحة المتبقية */
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: visible; /* تعديل للسماح بالسكرول الطبيعي */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: var(--surface-color);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .upload-section h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--primary-color);
+        }
+
+        .upload-section p {
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+        }
+
+        .upload-area {
+            background: var(--background-color);
+            border: 3px dashed var(--border-color);
+            border-radius: 20px;
+            padding: 50px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            background: #f1f5f9;
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            background: #e0f2fe;
+            border-color: var(--secondary-color);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .upload-subtext {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-md);
+        }
+
+        .upload-btn:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Preview Image */
+        .preview-container {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+
+        .preview-container.active {
+            display: block;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .preview-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .remove-btn {
+            background: var(--danger-high-bg);
+            color: var(--danger-high-text);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: #fecaca;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 12px;
+            max-height: 300px;
+            object-fit: contain;
+            background: var(--background-color);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-md);
+        }
+
+        .analyze-btn:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--surface-color);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .results-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .success-badge {
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-card {
+            background: var(--background-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .result-icon {
+            font-size: 1.5rem;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .result-content {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            border-radius: 10px;
+            transition: width 1s ease-out;
+        }
+
+        .confidence-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .danger-card {
+            background: var(--danger-high-bg);
+            border: 2px solid #fecaca;
+        }
+
+        .danger-level {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--danger-high-text);
+        }
+
+        .danger-description {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--danger-high-text);
+        }
+
+        .action-card {
+            background: var(--background-color);
+        }
+
+        .action-list {
+            list-style: none;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .action-item::before {
+            content: "•";
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--secondary-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-btn:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .upload-section {
+                padding: 30px 20px;
+            }
+            .upload-section h1 {
+                font-size: 1.4rem;
+            }
+            .upload-area {
+                padding: 40px 15px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+        /* تنسيق اللوجو الجديد */
+.header-logo {
+    height: 50px; /* ارتفاع مناسب للهيدر */
+    width: auto;  /* الحفاظ على أبعاد الصورة */
+    object-fit: contain;
+    z-index: 1001;
+    display: block; /* لإزالة أي هوامش سفلية افتراضية للصور */
+}
+
+.logo-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+    </style>
+</head>
+<body>
+
+    <header>
+<a href="home_page.html" class="logo-link">
+        <img src="final.png" alt="LiPH Logo" class="header-logo">
+    </a>
+    
+    <div class="menu-toggle" id="mobile-menu">
+        <i class="fa-solid fa-bars"></i>
+    </div>
+        <div class="nav-links" id="nav-links">
+            <a href="home_page.html">الرئيسية</a>
+            <a href="index.html">البحث</a>
+            <a href="ai.html">مساعد الطوارئ AI</a>
+            <a href="cam.html" class="active-link">البحث بالكاميرا</a>
+            <a href="alert.html">تنبيه التفاعلات</a>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <div class="main-content">
+            <div class="upload-section">
+                <h1>
+                    <span>📸</span>
+                    تحديد السموم بالصورة
+                </h1>
+                <p>قم برفع صورة للنبات أو المادة لتحديد مستوى خطورتها</p>
+
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">قم بسحب وإفلات الصورة هنا</div>
+                    <div class="upload-subtext">أو انقر للاختيار من جهازك</div>
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-image"></i>
+                        اختر صورة
+                    </button>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                </div>
+
+                <p style="margin-top: 20px; font-size: 0.85rem; opacity: 0.9;">
+                    الصيغ المدعومة: JPG, PNG, HEIC (حجم أقصى 10 ميجابايت)
+                </p>
+            </div>
+
+            <div class="preview-container" id="previewContainer">
+                <div class="preview-header">
+                    <span class="preview-title">معاينة الصورة</span>
+                    <button class="remove-btn" id="removeBtn">
+                        <i class="fas fa-times"></i> إزالة
+                    </button>
+                </div>
+                <img id="previewImage" class="preview-image" alt="Preview">
+                <button class="analyze-btn" id="analyzeBtn">
+                    <i class="fas fa-microscope"></i>
+                    تحليل الصورة
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="color: var(--text-secondary); font-weight: 600;">جاري التحليل...</p>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2 class="results-title">نتائج التحليل</h2>
+                    <span class="success-badge">
+                        <i class="fas fa-check-circle"></i>
+                        تم التحميل
+                    </span>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-card-header">
+                        <span class="result-icon">🌿</span>
+                        <span class="result-label">نوع النبات المكتشف</span>
+                    </div>
+                    <div class="result-content" id="plantName">نبات الدفلى (Nerium oleander)</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 95%"></div>
+                    </div>
+                    <div class="confidence-text">مستوى الثقة في التحديد: 95%</div>
+                </div>
+
+                <div class="result-card danger-card">
+                    <div class="result-card-header">
+                        <span class="result-icon">⚠️</span>
+                        <span class="result-label">مستوى الخطورة</span>
+                    </div>
+                    <div class="danger-level">
+                        <span>☠️</span>
+                        <span>خطورة عالية جداً</span>
+                    </div>
+                    <div class="danger-description">
+                        جميع أجزاء هذا النبات سامة بشدة، يحتوي على جليكوسيدات قلبية قد تكون مميتة حتى بكميات صغيرة.
+                    </div>
+                </div>
+
+                <div class="result-card action-card">
+                    <div class="result-card-header">
+                        <span class="result-icon">🚨</span>
+                        <span class="result-label">إجراءات فورية</span>
+                    </div>
+                    <ul class="action-list">
+                        <li class="action-item">لا تلمس النبات بيديك مطلقاً</li>
+                        <li class="action-item">في حالة الملامسة: اغسل المنطقة فوراً</li>
+                        <li class="action-item">في حالة الابتلاع: اتصل بالإسعاف فوراً</li>
+                        <li class="action-item">لا تحاول إحداث التقيؤ</li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <i class="fas fa-phone"></i>
+                        طلب المساعدة
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-file-alt"></i>
+                        التفاصيل الكاملة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        const icon = menuToggle.querySelector('i');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            if(navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+    </script>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const removeBtn = document.getElementById('removeBtn');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const resultsSection = document.getElementById('resultsSection');
+
+        fileInput.addEventListener('change', function(e) {
+            handleFile(e.target.files[0]);
+        });
+
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function() {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        uploadArea.addEventListener('click', function(e) {
+            if (e.target !== uploadArea && !uploadArea.contains(e.target)) return;
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+                fileInput.click();
+            }
+        });
+
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('يرجى اختيار ملف صورة صالح');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('حجم الملف يجب أن يكون أقل من 10 ميجابايت');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewContainer.classList.add('active');
+                resultsSection.classList.remove('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        removeBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            previewContainer.classList.remove('active');
+            resultsSection.classList.remove('active');
+        });
+
+        analyzeBtn.addEventListener('click', function() {
+            analyzeBtn.disabled = true;
+            loading.classList.add('active');
+            resultsSection.classList.remove('active');
+
+            setTimeout(() => {
+                loading.classList.remove('active');
+                resultsSection.classList.add('active');
+                analyzeBtn.disabled = false;
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 2500);
+        });
+    </script>
+</body>
+</html>

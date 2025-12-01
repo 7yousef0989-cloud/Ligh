@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قاعدة بيانات السموم | LiPH</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* متغيرات الهيدر (من الصفحة الرئيسية) */
+            --primary-blue: #0f204b;
+            --accent-teal: #2abfba;
+            --gradient-text: linear-gradient(135deg, #0f204b 0%, #2abfba 100%);
+            --header-height: 80px;
+            --text-grey: #666;
+
+            /* متغيرات صفحة قاعدة البيانات (الأصلية) */
+            --primary-color: #1e293b;
+            --secondary-color: #0ea5e9; /* تم الاحتفاظ بلون أزرار البحث الأصلي */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            
+            /* ألوان شارات الخطورة */
+            --danger-high-bg: #fee2e2;
+            --danger-high-text: #991b1b;
+            --danger-medium-bg: #fef3c7;
+            --danger-medium-text: #92400e;
+            --danger-low-bg: #dcfce7;
+            --danger-low-text: #166534;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Poppins', 'Cairo', sans-serif; /* دمج الخطوط */
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =========================================
+           1. ستايل الهيدر الجديد (من الصفحة السابقة)
+           ========================================= */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            position: relative; /* تغيير من sticky ليتناسب مع تصميم الهيدر الجديد */
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 1001;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-grey);
+        }
+
+        .nav-links a {
+            transition: color 0.3s;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-teal);
+        }
+        
+        /* تمييز الرابط النشط الحالي */
+        .nav-links a.active-link {
+            color: var(--accent-teal);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* ميديا كويري للهيدر */
+        @media (max-width: 900px) {
+            .menu-toggle { display: block; }
+            .nav-links {
+                position: absolute;
+                top: var(--header-height);
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 0;
+                height: 0;
+                overflow: hidden;
+                transition: all 0.3s ease-in-out;
+                box-shadow: 0 10px 10px rgba(0,0,0,0.05);
+                border-bottom: 1px solid var(--border-color);
+            }
+            .nav-links.active {
+                height: auto;
+                padding: 30px 0;
+                border-bottom: 3px solid var(--accent-teal);
+            }
+        }
+
+        /* =========================================
+           2. ستايل صفحة قاعدة البيانات (الأصلي)
+           ========================================= */
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(to bottom, var(--surface-color), var(--background-color));
+            padding: 4rem 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* Search & Filter */
+        .controls-container {
+            max-width: 800px;
+            margin: -2rem auto 3rem;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-box {
+            background: var(--surface-color);
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-family: 'Cairo', sans-serif;
+            outline: none;
+            color: var(--text-primary);
+        }
+
+        .search-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-btn:hover {
+            background-color: #0284c7;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .category-tag {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .category-tag:hover {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            background-color: #f0f9ff;
+        }
+
+        .category-tag.active {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Results Grid */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 4rem;
+            flex: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--secondary-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            background: var(--background-color);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .danger-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .danger-high { background: var(--danger-high-bg); color: var(--danger-high-text); }
+        .danger-medium { background: var(--danger-medium-bg); color: var(--danger-medium-text); }
+        .danger-low { background: var(--danger-low-bg); color: var(--danger-low-text); }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .card-category {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: inline-block;
+            background: var(--background-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+            background: var(--surface-color);
+            border-radius: 16px;
+            border: 1px dashed var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .search-box { flex-direction: column; padding: 16px; }
+            .search-btn { width: 100%; }
+            .results-grid { grid-template-columns: 1fr; }
+        }
+        /* تنسيق اللوجو الجديد */
+.header-logo {
+    height: 50px; /* ارتفاع مناسب للهيدر */
+    width: auto;  /* الحفاظ على أبعاد الصورة */
+    object-fit: contain;
+    z-index: 1001;
+    display: block; /* لإزالة أي هوامش سفلية افتراضية للصور */
+}
+
+.logo-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+    </style>
+</head>
+<body>
+
+    <header>
+<a href="home_page.html" class="logo-link">
+        <img src="final.png" alt="LiPH Logo" class="header-logo">
+    </a>
+    
+    <div class="menu-toggle" id="mobile-menu">
+        <i class="fa-solid fa-bars"></i>
+    </div>
+
+        <div class="nav-links" id="nav-links">
+            <a href="home_page.html">الرئيسية</a>
+            <a href="index.html" class="active-link">البحث</a> 
+            <a href="ai.html">مساعد الطوارئ AI</a>
+            <a href="cam.html">البحث بالكاميرا</a>
+            <a href="alert.html">تنبيه التفاعلات</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1 class="hero-title">الموسوعة الشاملة للسموم</h1>
+        <p class="hero-subtitle">مرجع علمي موثوق للمواد السامة، النباتات، والأدوية الخطرة. ابحث وتعرف على المخاطر وطرق الوقاية.</p>
+    </section>
+
+    <div class="controls-container">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن اسم المادة، الأعراض، أو التصنيف...">
+            <button class="search-btn" id="searchBtn">بحث</button>
+        </div>
+
+        <div class="categories" id="categoryTags">
+            <button class="category-tag active" data-category="all">الكل</button>
+            <button class="category-tag" data-category="نباتات">🌿 نباتات</button>
+            <button class="category-tag" data-category="أدوية">💊 أدوية</button>
+            <button class="category-tag" data-category="كيميائية">⚗️ كيميائية</button>
+            <button class="category-tag" data-category="حيوانات">🐍 حيوانية</button>
+            <button class="category-tag" data-category="فطريات">🍄 فطريات</button>
+            <button class="category-tag" data-category="صناعية">🏭 صناعية</button>
+        </div>
+    </div>
+
+    <main class="main-container">
+        <div class="section-header">
+            <h2 class="section-title" id="resultsTitle">أحدث الإضافات</h2>
+        </div>
+        <div id="resultsContainer" class="results-grid"></div>
+    </main>
+
+    <script>
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        const icon = menuToggle.querySelector('i');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            if(navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+    </script>
+
+    <script>
+        // قاعدة البيانات
+        const poisonsDatabase = [
+            {
+                id: 1,
+                name: "سم الأفعى",
+                icon: "🐍",
+                category: "حيوانات",
+                danger: "عالية",
+                description: "سم الأفعى يحتوي على إنزيمات بروتينية تؤثر على الجهاز العصبي والدورة الدموية، يتطلب تدخلاً طبياً فورياً قوياً ويمكن أن يسبب شلل تنفسي وفشل كلوي إذا لم يتم العلاج بسرعة."
+            },
+            {
+                id: 2,
+                name: "نبات الدفلى",
+                icon: "🌿",
+                category: "نباتات",
+                danger: "عالية",
+                description: "نبات شديد السمية يحتوي على جليكوسيدات قلبية. جميع أجزاء النبات سامة ويمكن أن تسبب اضطرابات قلبية خطيرة وغثيان وقيء شديد. حتى استنشاق الدخان من حرق النبات خطير للغاية."
+            },
+            {
+                id: 3,
+                name: "باراسيتامول (جرعة زائدة)",
+                icon: "💊",
+                category: "أدوية",
+                danger: "متوسطة",
+                description: "الجرعات الزائدة من الباراسيتامول يمكن أن تسبب تلفاً كبدياً خطيراً. الحد الأقصى اليومي هو 4000 مجم للبالغين. الأعراض قد لا تظهر فوراً لكن الضرر يحدث بصمت."
+            },
+            {
+                id: 4,
+                name: "أول أكسيد الكربون",
+                icon: "☁️",
+                category: "كيميائية",
+                danger: "عالية",
+                description: "غاز عديم اللون والرائحة ينتج عن الاحتراق غير الكامل. يرتبط بالهيموجلوبين في الدم مانعاً نقل الأكسجين. يسبب صداع، دوار، غثيان وقد يؤدي للوفاة بسرعة."
+            },
+            {
+                id: 5,
+                name: "فطر الأمانيت السام",
+                icon: "🍄",
+                category: "فطريات",
+                danger: "عالية",
+                description: "من أخطر الفطريات السامة في العالم. يحتوي على سموم تدمر الكبد والكلى. الأعراض تظهر متأخرة (6-12 ساعة) ومعدل الوفيات مرتفع حتى مع العلاج."
+            },
+            {
+                id: 6,
+                name: "الزئبق",
+                icon: "💧",
+                category: "كيميائية",
+                danger: "عالية",
+                description: "معدن سائل سام يتراكم في الجسم. التعرض المزمن يسبب تلف الجهاز العصبي، الكلى، والجهاز الهضمي. خطير بشكل خاص في صورته العضوية (ميثيل الزئبق)."
+            },
+            {
+                id: 7,
+                name: "السيانيد",
+                icon: "⚠️",
+                category: "كيميائية",
+                danger: "عالية",
+                description: "سم قاتل فوري يمنع الخلايا من استخدام الأكسجين. موجود في بذور بعض الفواكه بتركيزات منخفضة. الجرعات العالية تسبب الوفاة خلال دقائق."
+            },
+            {
+                id: 8,
+                name: "الأسبرين (جرعة عالية)",
+                icon: "💊",
+                category: "أدوية",
+                danger: "متوسطة",
+                description: "الجرعات العالية من الأسبرين تسبب التسمم الساليسيلي الذي يؤدي لطنين الأذن، غثيان، حمى، وفي الحالات الشديدة تلف الكلى واضطراب حمضية الدم."
+            },
+            {
+                id: 9,
+                name: "نبات الخروع",
+                icon: "🌱",
+                category: "نباتات",
+                danger: "عالية",
+                description: "بذور الخروع تحتوي على الريسين، أحد أقوى السموم الطبيعية. كمية صغيرة كافية للقتل. يسبب قيء، إسهال دموي، تشنجات، وفشل كلوي."
+            },
+            {
+                id: 10,
+                name: "الكلور (غاز)",
+                icon: "☁️",
+                category: "صناعية",
+                danger: "عالية",
+                description: "غاز أخضر مصفر كاوي للغاية. يستخدم في التطهير لكنه خطير جداً عند الاستنشاق. يسبب تلف حاد للرئتين والجهاز التنفسي وقد يؤدي للوفاة."
+            },
+            {
+                id: 11,
+                name: "سم العقرب",
+                icon: "🦂",
+                category: "حيوانات",
+                danger: "متوسطة",
+                description: "يحتوي على سموم عصبية تسبب ألم شديد، تشنجات عضلية، صعوبة تنفس. معظم الأنواع غير قاتلة للبالغين لكنها خطيرة على الأطفال."
+            },
+            {
+                id: 12,
+                name: "الميثانول (كحول الخشب)",
+                icon: "🧪",
+                category: "كيميائية",
+                danger: "عالية",
+                description: "كحول صناعي سام جداً. حتى الكميات الصغيرة تسبب العمى وتلف الجهاز العصبي. يتحول في الجسم لحمض الفورميك القاتل."
+            },
+            {
+                id: 13,
+                name: "الديجوكسين (جرعة زائدة)",
+                icon: "💊",
+                category: "أدوية",
+                danger: "عالية",
+                description: "دواء قلبي قوي مستخرج من نبات الديجيتال. الجرعة الزائدة تسبب اضطرابات قلبية خطيرة، غثيان، ورؤية صفراء مخضرة."
+            },
+            {
+                id: 14,
+                name: "البيليدونا (ست الحسن)",
+                icon: "🫐",
+                category: "نباتات",
+                danger: "عالية",
+                description: "نبات يحتوي على الأتروبين والسكوبولامين. يسبب توسع حدقة العين، جفاف الفم، هلوسة، تشنجات وقد يؤدي للوفاة."
+            },
+            {
+                id: 15,
+                name: "الرصاص",
+                icon: "⚙️",
+                category: "صناعية",
+                danger: "متوسطة",
+                description: "معدن ثقيل يتراكم في العظام والأنسجة. التعرض المزمن يسبب تلف الجهاز العصبي خاصة عند الأطفال، فقر دم، وتلف الكلى."
+            },
+            {
+                id: 16,
+                name: "فطر الشيتاكي النيء",
+                icon: "🍄",
+                category: "فطريات",
+                danger: "منخفضة",
+                description: "يسبب طفح جلدي شديد يسمى التهاب الجلد الشيتاكي عند تناوله نيئاً. الأعراض مؤقتة لكنها مزعجة. الطهي يحطم المركب المسبب."
+            },
+            {
+                id: 17,
+                name: "سم قنديل البحر",
+                icon: "🪼",
+                category: "حيوانات",
+                danger: "متوسطة",
+                description: "بعض الأنواع مثل قنديل الصندوق قاتل. يسبب ألم شديد، تشنجات، صدمة، وفي الحالات الشديدة توقف القلب خلال دقائق."
+            },
+            {
+                id: 18,
+                name: "الفورمالديهايد",
+                icon: "🧪",
+                category: "صناعية",
+                danger: "متوسطة",
+                description: "مادة حافظة ومطهرة كاوية. الاستنشاق يسبب تهيج الجهاز التنفسي، حروق، ومصنف كمادة مسرطنة. خطر عند التركيزات العالية."
+            },
+            {
+                id: 19,
+                name: "الوارفارين (جرعة زائدة)",
+                icon: "💊",
+                category: "أدوية",
+                danger: "عالية",
+                description: "مضاد تخثر يستخدم دواءً وسم فئران. الجرعة الزائدة تسبب نزيف داخلي خطير قد يكون قاتلاً. يحتاج مراقبة دقيقة."
+            },
+            {
+                id: 20,
+                name: "نبات الحشيش السام",
+                icon: "🌿",
+                category: "نباتات",
+                danger: "عالية",
+                description: "يحتوي على الكونين، سم عصبي قوي. يسبب شلل تدريجي يبدأ من الأطراف ويصل للجهاز التنفسي. استخدم لإعدام سقراط."
+            }
+        ];
+
+        // عناصر الصفحة
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const categoryTags = document.querySelectorAll('.category-tag');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsTitle = document.getElementById('resultsTitle');
+
+        let currentFilter = 'all';
+
+        // عرض النتائج
+        function displayResults(results, title = 'النتائج') {
+            if (title) resultsTitle.textContent = title;
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                        <h3>لا توجد نتائج مطابقة</h3>
+                        <p>حاول البحث بكلمات مختلفة أو تغيير الفئة</p>
+                    </div>`;
+                return;
+            }
+
+            resultsContainer.innerHTML = results.map(item => `
+                <div class="card" data-id="${item.id}">
+                    <div class="card-header">
+                        <div class="card-icon">${item.icon}</div>
+                        <span class="danger-badge danger-${getDangerClass(item.danger)}">خطورة ${item.danger}</span>
+                    </div>
+                    <div class="card-title">${item.name}</div>
+                    <div class="card-category">${item.category}</div>
+                    <p class="card-desc">${item.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // تحديد نوع الخطورة
+        function getDangerClass(danger) {
+            if (danger === 'عالية') return 'high';
+            if (danger === 'متوسطة') return 'medium';
+            return 'low';
+        }
+
+        // البحث
+        function performSearch(query) {
+            query = query.trim().toLowerCase();
+            
+            if (!query) {
+                if (currentFilter === 'all') {
+                    displayResults(poisonsDatabase, 'جميع النتائج');
+                } else {
+                    filterByCategory(currentFilter);
+                }
+                return;
+            }
+
+            const results = poisonsDatabase.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(query) ||
+                                    item.description.toLowerCase().includes(query) ||
+                                    item.category.toLowerCase().includes(query);
+                const matchesCategory = currentFilter === 'all' || item.category === currentFilter;
+                
+                return matchesSearch && matchesCategory;
+            });
+
+            displayResults(results, `نتائج البحث: "${query}"`);
+        }
+
+        // الفلترة حسب الفئة
+        function filterByCategory(category) {
+            currentFilter = category;
+            
+            if (category === 'all') {
+                displayResults(poisonsDatabase, 'جميع النتائج');
+            } else {
+                const results = poisonsDatabase.filter(item => item.category === category);
+                displayResults(results, `${category}`);
+            }
+        }
+
+        // أحداث البحث
+        searchBtn.addEventListener('click', () => {
+            performSearch(searchInput.value);
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(searchInput.value);
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            if (e.target.value === '') {
+                performSearch('');
+            }
+        });
+
+        // أحداث الفئات
+        categoryTags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                // تحديث الستايل
+                categoryTags.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // تنفيذ الفلترة
+                const category = this.dataset.category;
+                filterByCategory(category);
+                
+                // إعادة البحث إذا كان هناك نص
+                if (searchInput.value.trim()) {
+                    performSearch(searchInput.value);
+                }
+            });
+        });
+
+        // عرض النتائج الافتراضية
+        displayResults(poisonsDatabase, 'جميع النتائج');
+    </script>
+</body>
+</html>

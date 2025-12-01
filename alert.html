@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تنبيهات التفاعلات الدوائية - LiPH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* متغيرات الهيدر */
+            --primary-blue: #0f204b;
+            --accent-teal: #2abfba;
+            --gradient-text: linear-gradient(135deg, #0f204b 0%, #2abfba 100%);
+            --header-height: 80px;
+            --text-grey: #666;
+
+            /* متغيرات الصفحة */
+            --primary-color: #1e293b;
+            --secondary-color: #0ea5e9;
+            --accent-color: #3b82f6;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --danger-high-bg: #fee2e2;
+            --danger-high-text: #991b1b;
+            --danger-medium-bg: #fef3c7;
+            --danger-medium-text: #92400e;
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Poppins', 'Cairo', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- ستايل الهيدر الموحد --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 1001;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-grey);
+        }
+
+        .nav-links a {
+            transition: color 0.3s;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-links a:hover, .nav-links a.active-link {
+            color: var(--accent-teal);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        @media (max-width: 900px) {
+            .menu-toggle { display: block; }
+            .nav-links {
+                position: absolute;
+                top: var(--header-height);
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 0;
+                height: 0;
+                overflow: hidden;
+                transition: all 0.3s ease-in-out;
+                box-shadow: 0 10px 10px rgba(0,0,0,0.05);
+                border-bottom: 1px solid var(--border-color);
+            }
+            .nav-links.active {
+                height: auto;
+                padding: 30px 0;
+                border-bottom: 3px solid var(--accent-teal);
+            }
+        }
+
+        /* --- محتوى الصفحة --- */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section (Specific to Alert Page) */
+        .header-section {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-section h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header-section p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px 20px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .summary-card {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .summary-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .summary-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .risk-meter {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .risk-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .risk-bar-container {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(to right, 
+                #dcfce7 0%, 
+                #fef3c7 50%, 
+                #fee2e2 100%);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .risk-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: left 0.5s ease;
+        }
+
+        .risk-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .current-meds-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .med-item {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .med-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .med-icon {
+            font-size: 1.5rem;
+        }
+
+        .med-details {
+            flex: 1;
+        }
+
+        .med-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+        }
+
+        .med-dose {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Alerts Section */
+        .alerts-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .alerts-header {
+            background: var(--surface-color);
+            border-radius: 16px;
+            padding: 20px 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alerts-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alerts-badge {
+            background: #dc2626;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* Alert Card */
+        .alert-card {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-card::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+        }
+
+        .alert-card.danger::before {
+            background: #dc2626;
+        }
+
+        .alert-card.warning::before {
+            background: #f59e0b;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .alert-title-section {
+            flex: 1;
+        }
+
+        .alert-severity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .severity-icon {
+            font-size: 1.5rem;
+        }
+
+        .severity-text {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .alert-card.danger .severity-text {
+            color: #dc2626;
+        }
+
+        .alert-card.warning .severity-text {
+            color: #f59e0b;
+        }
+
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .alert-card.danger .severity-badge {
+            background: var(--danger-high-bg);
+            color: var(--danger-high-text);
+        }
+
+        .alert-card.warning .severity-badge {
+            background: var(--danger-medium-bg);
+            color: var(--danger-medium-text);
+        }
+
+        .drug-interaction {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .drug-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .interaction-icon {
+            color: #ef4444;
+            font-size: 1.3rem;
+        }
+
+        .alert-description {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .alerts-section {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .summary-number {
+                font-size: 3rem;
+            }
+
+            .drug-interaction {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .action-btn {
+                flex: 1 1 100%;
+                justify-content: center;
+            }
+        }
+        /* تنسيق اللوجو الجديد */
+.header-logo {
+    height: 50px; /* ارتفاع مناسب للهيدر */
+    width: auto;  /* الحفاظ على أبعاد الصورة */
+    object-fit: contain;
+    z-index: 1001;
+    display: block; /* لإزالة أي هوامش سفلية افتراضية للصور */
+}
+
+.logo-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+    </style>
+</head>
+<body>
+
+    <header>
+<a href="home_page.html" class="logo-link">
+        <img src="final.png" alt="LiPH Logo" class="header-logo">
+    </a>
+    
+    <div class="menu-toggle" id="mobile-menu">
+        <i class="fa-solid fa-bars"></i>
+    </div>
+        <div class="nav-links" id="nav-links">
+            <a href="home_page.html">الرئيسية</a>
+            <a href="index.html">البحث</a>
+            <a href="ai.html">مساعد الطوارئ AI</a>
+            <a href="cam.html">البحث بالكاميرا</a>
+            <a href="alert.html" class="active-link">تنبيه التفاعلات</a>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <div class="header-section">
+            <h1>
+                <span>⚠️</span>
+                نظام تنبيهات التفاعلات الدوائية
+            </h1>
+            <p>مراقبة فورية للتفاعلات الخطرة بين الأدوية والأعشاب</p>
+        </div>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="summary-card">
+                    <div class="summary-number">5</div>
+                    <div class="summary-label">تنبيهات نشطة</div>
+                </div>
+
+                <div class="risk-meter">
+                    <div class="risk-title">مستوى الخطر الإجمالي</div>
+                    <div class="risk-bar-container">
+                        <div class="risk-indicator" style="left: 75%;">⚠️</div>
+                    </div>
+                    <div class="risk-labels">
+                        <span>منخفض</span>
+                        <span>متوسط</span>
+                        <span>عالي</span>
+                    </div>
+                </div>
+
+                <div class="risk-meter">
+                    <div class="current-meds-title">الأدوية الحالية</div>
+                    
+                    <div class="med-item">
+                        <div class="med-info">
+                            <span class="med-icon">💊</span>
+                            <div class="med-details">
+                                <div class="med-name">وارفارين</div>
+                                <div class="med-dose">5 مجم يومياً</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="med-item">
+                        <div class="med-info">
+                            <span class="med-icon">💊</span>
+                            <div class="med-details">
+                                <div class="med-name">أملوديبين</div>
+                                <div class="med-dose">10 مجم يومياً</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="med-item">
+                        <div class="med-info">
+                            <span class="med-icon">💊</span>
+                            <div class="med-details">
+                                <div class="med-name">ليثيوم</div>
+                                <div class="med-dose">300 مجم مرتين</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="alerts-section">
+                <div class="alerts-header">
+                    <h2 class="alerts-title">
+                        🚨 التنبيهات النشطة
+                    </h2>
+                    <span class="alerts-badge">5 تنبيهات</span>
+                </div>
+
+                <div class="alert-card danger">
+                    <div class="alert-header">
+                        <div class="alert-title-section">
+                            <div class="alert-severity">
+                                <span class="severity-icon">☠️</span>
+                                <span class="severity-text">تفاعل خطير جداً</span>
+                                <span class="severity-badge">حرج</span>
+                            </div>
+                            
+                            <div class="drug-interaction">
+                                <span class="drug-name">💊 أسبرين</span>
+                                <span class="interaction-icon">⚡</span>
+                                <span class="drug-name">💊 وارفارين</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert-description">
+                        خطر شديد! هذا المزيج يزيد بشكل كبير من خطر النزيف الداخلي. يجب استشارة الطبيب فوراً قبل الاستخدام المتزامن.
+                    </div>
+
+                    <div class="alert-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-phone"></i>
+                            استشر طبيبك
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-times-circle"></i>
+                            إخفاء التنبيه
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-calendar"></i>
+                            التفاصيل الكاملة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="alert-card warning">
+                    <div class="alert-header">
+                        <div class="alert-title-section">
+                            <div class="alert-severity">
+                                <span class="severity-icon">⚠️</span>
+                                <span class="severity-text">تفاعل عالي الخطورة</span>
+                                <span class="severity-badge">عالي</span>
+                            </div>
+                            
+                            <div class="drug-interaction">
+                                <span class="drug-name">💊 ليثيوم</span>
+                                <span class="interaction-icon">⚡</span>
+                                <span class="drug-name">💊 إيبوبروفين</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert-description">
+                        مضادات الالتهاب قد ترفع مستويات الليثيوم في الدم مما قد يؤدي لسمية. يُنصح بمراقبة مستويات الليثيوم.
+                    </div>
+
+                    <div class="alert-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            افحص المزيد
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-flask"></i>
+                            بدائل آمنة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="alert-card danger">
+                    <div class="alert-header">
+                        <div class="alert-title-section">
+                            <div class="alert-severity">
+                                <span class="severity-icon">☠️</span>
+                                <span class="severity-text">تفاعل خطير جداً</span>
+                                <span class="severity-badge">حرج</span>
+                            </div>
+                            
+                            <div class="drug-interaction">
+                                <span class="drug-name">💊 وارفارين</span>
+                                <span class="interaction-icon">⚡</span>
+                                <span class="drug-name">🌿 جنكو بيلوبا</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert-description">
+                        تفاعل خطير! الجنكو بيلوبا يزيد من خطر النزيف عند تناوله مع الوارفارين. تجنب هذا المزيج تماماً.
+                    </div>
+
+                    <div class="alert-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            تحذير عاجل
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-book-medical"></i>
+                            معلومات تفصيلية
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        const icon = menuToggle.querySelector('i');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            if(navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+    </script>
+</body>
+</html>

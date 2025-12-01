@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiPH - Intelligent Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #0f204b;
+            --accent-teal: #2abfba;
+            --gradient-text: linear-gradient(135deg, #0f204b 0%, #2abfba 100%);
+            --gradient-bg: linear-gradient(135deg, #0f204b 0%, #1a3a6c 100%);
+            --text-grey: #666;
+            --bg-white: #ffffff;
+            --bg-light: #f9fbfd;
+            --header-height: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Poppins', 'Cairo', sans-serif;
+            background-color: var(--bg-white);
+            color: var(--primary-blue);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- 1. القائمة العلوية (لم يتم التغيير) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 1001;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-grey);
+        }
+
+        .nav-links a {
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-teal);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .header-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            z-index: 1001;
+            display: block;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- 2. منطقة الوسط - Hero Split --- */
+        .hero-container {
+            /* تعديل الارتفاع ليكون مريحاً أكثر */
+            min-height: 85vh; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px 5%;
+            position: relative;
+            gap: 40px;
+        }
+
+        .hero-text {
+            width: 50%;
+            z-index: 2;
+        }
+
+        .slogan-small {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-teal);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            background: rgba(42, 191, 186, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .main-title-en {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--primary-blue);
+            direction: ltr;
+            text-align: right; 
+        }
+
+        .main-title-ar {
+            font-family: 'Cairo', sans-serif;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: var(--text-grey);
+            line-height: 1.8;
+            margin-bottom: 40px;
+            border-right: 4px solid var(--accent-teal);
+            padding-right: 20px;
+            max-width: 600px;
+        }
+
+        /* أزرار جديدة للهيرو */
+        .hero-btns {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 10px 20px rgba(15, 32, 75, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            background: #1a3a6c;
+            box-shadow: 0 15px 25px rgba(15, 32, 75, 0.3);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* الجانب الأيسر: الصورة */
+        .hero-visual {
+            width: 45%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-visual img {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 20px 40px rgba(15, 32, 75, 0.15));
+        }
+
+        .bg-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(42, 191, 186, 0.03) 10px, rgba(42, 191, 186, 0.03) 11px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- 3. شريط الوصول السريع (Quick Access) --- */
+        .quick-access-bar {
+            background: #fff;
+            padding: 40px 5%;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+            transform: translateY(-50px); /* تداخل جميل مع الهيرو */
+            z-index: 10;
+            position: relative;
+            margin-bottom: -50px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: var(--primary-blue);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-teal);
+        }
+
+        .serv-icon-box {
+            width: 50px;
+            height: 50px;
+            background: rgba(42, 191, 186, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: var(--accent-teal);
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        .service-card:hover .serv-icon-box {
+            background: var(--accent-teal);
+            color: white;
+        }
+
+        .serv-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .serv-desc {
+            font-size: 0.85rem;
+            color: var(--text-grey);
+            line-height: 1.5;
+        }
+
+        /* --- 4. قسم المميزات (Features Section) --- */
+        .features-section {
+            padding: 100px 5%;
+            background-color: var(--bg-light);
+            text-align: center;
+        }
+
+        .section-head {
+            margin-bottom: 60px;
+        }
+
+        .section-head h2 {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .section-head p {
+            color: var(--text-grey);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: right;
+            transition: 0.3s;
+        }
+
+        .feature-box:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        }
+
+        .ft-icon {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .feature-box h3 {
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+
+        .feature-box p {
+            color: var(--text-grey);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* --- 5. شريط الإحصائيات (Stats) --- */
+        .stats-bar {
+            background: var(--gradient-bg);
+            padding: 60px 5%;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            text-align: center;
+            gap: 30px;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: var(--accent-teal);
+        }
+
+        .stat-item p {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* --- 6. الفوتر الحقيقي (Footer) --- */
+        .main-footer {
+            background: #0a1635;
+            color: white;
+            padding: 70px 5% 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-col h4 {
+            color: var(--accent-teal);
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-teal);
+            transform: translateX(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 30px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* --- استجابة الشاشات (Media Queries) --- */
+        @media (max-width: 900px) {
+            .menu-toggle { display: block; }
+
+            .nav-links {
+                position: absolute;
+                top: var(--header-height);
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 0;
+                height: 0;
+                overflow: hidden;
+                transition: all 0.3s ease-in-out;
+                box-shadow: 0 10px 10px rgba(0,0,0,0.05);
+            }
+
+            .nav-links.active {
+                height: auto;
+                padding: 30px 0;
+                border-bottom: 3px solid var(--accent-teal);
+            }
+
+            .hero-container {
+                flex-direction: column-reverse;
+                text-align: center;
+                justify-content: center;
+                padding-top: 40px;
+                min-height: auto;
+            }
+
+            .hero-text, .hero-visual { width: 100%; }
+
+            .main-title-en { text-align: center; }
+
+            .main-title-ar {
+                border-right: none;
+                border-bottom: 3px solid var(--accent-teal);
+                padding-right: 0;
+                padding-bottom: 15px;
+                margin: 0 auto 30px auto;
+                width: fit-content;
+            }
+
+            .hero-btns {
+                justify-content: center;
+            }
+
+            .quick-access-bar {
+                transform: translateY(0);
+                margin-bottom: 0;
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-lines"></div>
+
+    <header>
+        <a href="home_page.html" class="logo-link">
+            <img src="final.png" alt="LiPH Logo" class="header-logo">
+        </a>
+        
+        <div class="menu-toggle" id="mobile-menu">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+
+        <div class="nav-links" id="nav-links">
+            <a href="home_page.html" style="text-decoration: none; color: inherit;">الرئيسية</a>
+            <a href="index.html" style="text-decoration: none; color: inherit;">البحث</a>
+            <a href="ai.html" style="text-decoration: none; color: inherit;">مساعد الطوارئ AI</a>
+            <a href="cam.html" style="text-decoration: none; color: inherit;">البحث بالكاميرا</a>
+            <a href="alert.html" style="text-decoration: none; color: inherit;">تنبيه التفاعلات</a>
+        </div>
+    </header>
+
+    <section class="hero-container">
+        <div class="hero-text">
+            <div class="slogan-small">Detect Faster. Act Smarter.</div>
+            <h1 class="main-title-en">Integrated AI Platform for Poisoning Prevention</h1>
+            <p class="main-title-ar">
+                منظومة ذكية متكاملة تعمل بالذكاء الاصطناعي لتحليل السموم، التنبؤ بالمخاطر، وتقديم إرشادات طبية فورية لحماية الأرواح.
+            </p>
+            <div class="hero-btns">
+                <a href="ai.html" class="btn btn-primary">
+                    <i class="fa-solid fa-robot"></i>
+                    ابدأ التشخيص
+                </a>
+                <a href="#features" class="btn btn-outline">
+                    تعرف علينا
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <img src="final.png" alt="LiPH Platform">
+        </div>
+    </section>
+
+    <div class="quick-access-bar">
+        
+        <a href="index.html" class="service-card">
+            <div class="serv-icon-box">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+            </div>
+            <div class="serv-title">تحليل السموم</div>
+            <div class="serv-desc">قاعدة بيانات شاملة للبحث الفوري عن المواد السامة.</div>
+        </a>
+
+        <a href="ai.html" class="service-card">
+            <div class="serv-icon-box">
+                <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <div class="serv-title">مساعد الطوارئ</div>
+            <div class="serv-desc">نظام محادثة ذكي لتقديم الإسعافات الأولية فوراً.</div>
+        </a>
+
+        <a href="cam.html" class="service-card">
+            <div class="serv-icon-box">
+                <i class="fa-solid fa-camera-rotate"></i>
+            </div>
+            <div class="serv-title">التعرف البصري</div>
+            <div class="serv-desc">مسح ضوئي للأدوية والمواد عبر الكاميرا.</div>
+        </a>
+
+        <a href="alert.html" class="service-card">
+            <div class="serv-icon-box">
+                <i class="fa-solid fa-capsules"></i>
+            </div>
+            <div class="serv-title">تفاعل الأدوية</div>
+            <div class="serv-desc">كشف التعارضات الخطيرة بين الأدوية المختلفة.</div>
+        </a>
+
+    </div>
+
+    <section class="features-section" id="features">
+        <div class="section-head">
+            <h2>لماذا تختار منصة LiPH؟</h2>
+            <p>نقدم حلولاً تقنية متقدمة لتقليل الأخطاء الطبية وتسريع الاستجابة في حالات الطوارئ.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-box">
+                <i class="fa-solid fa-bolt ft-icon"></i>
+                <h3>سرعة الاستجابة</h3>
+                <p>تحليل فوري للحالة وتقديم البروتوكول العلاجي المناسب في ثوانٍ معدودة.</p>
+            </div>
+            <div class="feature-box">
+                <i class="fa-solid fa-brain ft-icon"></i>
+                <h3>دقة الذكاء الاصطناعي</h3>
+                <p>خوارزميات متطورة للتعرف على الأدوية والمواد الكيميائية بدقة عالية</p>
+            </div>
+            <div class="feature-box">
+                <i class="fa-solid fa-shield-heart ft-icon"></i>
+                <h3>حماية استباقية</h3>
+                <p>تنبيهات مبكرة عن التفاعلات الدوائية الخطيرة قبل حدوث الضرر.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-bar">
+        <div class="stat-item">
+            <h3>+5000</h3>
+            <p>مادة مسجلة</p>
+        </div>
+        <div class="stat-item">
+            <h3>24/7</h3>
+            <p>دعم فوري</p>
+        </div>
+        <div class="stat-item">
+            <h3>99%</h3>
+            <p>دقة التحليل</p>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <img src="final.png" alt="Logo" style="height: 40px; margin-bottom: 20px; filter: brightness(0) invert(1);">
+                <p style="opacity: 0.7; line-height: 1.6;">
+                    منصة LiPH هي رفيقك الذكي للحماية من مخاطر التسمم، ندمج بين الخبرة الطبية وتقنيات الذكاء الاصطناعي لبيئة أكثر أماناً.
+                </p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>روابط سريعة</h4>
+                <ul class="footer-links">
+                    <li><a href="home_page.html">الرئيسية</a></li>
+                    <li><a href="ai.html">التشخيص الذكي</a></li>
+                    <li><a href="index.html">قاعدة البيانات</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>تواصل معنا</h4>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fa-solid fa-envelope"></i> support@liph.com</a></li>
+                    <li><a href="#"><i class="fa-solid fa-phone"></i> 123-456-7890</a></li>
+                    <li><a href="#"><i class="fa-solid fa-location-dot"></i> القاهرة، مصر</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 LiPH Platform. جميع الحقوق محفوظة.
+        </div>
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        const icon = menuToggle.querySelector('i');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            if(navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+    </script>
+</body>
+</html>
